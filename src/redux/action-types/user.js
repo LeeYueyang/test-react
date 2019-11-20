@@ -1,0 +1,1 @@
+export const SET_USER_ASYNC = 'SET_USER_ASYNC';

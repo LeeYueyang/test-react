@@ -50,21 +50,20 @@
         }
 
         axiosIns.interceptors.response.use((res) => {
-            console.log(res);
             if (res.data.status === 0) {
                 return res.data.data;
             } else {
-                //return Promise.reject(res.data.msg);
-                return 'test errMsg';
+                return Promise.reject(res.data.msg);
+                //return 'test errMsg';
             }
         }, (err) => {
             if (err.response) {
-                const errMsg = status[err.response.status]? status[err.response.status] : '网络故障';
+                const errMsg = status[err.response.status] ? status[err.response.status] : '网络故障';
                 return Promise.reject(errMsg);
-            }else{
+            } else {
                 if (err.message.match(/Network Error/g)) {
                     return Promise.reject('服务没有启动');
-                }else if (err.message.match(/timeout/g)) {
+                } else if (err.message.match(/timeout/g)) {
                     return Promise.reject('连接超时');
                 }
             }
@@ -102,7 +101,9 @@
             return Promise.reject(err);
         }); */
 
-        btns[0].addEventListener('click', () => {
+
+
+        /* btns[0].addEventListener('click', () => {
             axiosIns({
                 method: 'POST',
                 url: '/login',
@@ -111,27 +112,66 @@
                     password: 'admin1'
                 }
             }).then((res) => {
-                /* if (!res.data.status) {
+                if (!res.data.status) {
                     //console.log(res.data.data);
                     axiosIns.token = res.data.data.token;
                 } else {
                     //console.log(res.data.msg);
-                } */
+                }
                 axiosIns.token = res.token;
                 console.log(res);
             }).catch((err) => {
                 console.log(err);
                 alert(err);
             });
-        })
+        }) */
+
+        function reqLogin(username, password) {
+            return axiosIns({
+                method: 'POST',
+                url: '/login',
+                data: {
+                    username,
+                    password
+                }
+            })
+        }
+
+        function reqGetInfo() {
+            return axiosIns({
+                method: 'GET',
+                url: '/user/get'
+            })
+        }
+
+        function getInfo2(categoryName) {
+            return axiosIns({
+                method: 'POST',
+                url: '/category/add',
+                data: {
+                    categoryName
+                }
+            })
+        }
+
+        btns[0].addEventListener('click', () => {
+            reqLogin('admin', 'admin')
+                .then((res) => {
+                    axiosIns.token = res.token;
+                    console.log(res);
+                })
+        });
 
         btns[1].addEventListener('click', () => {
+            reqGetInfo()
+                .then((res) => {
+                    console.log(res);
+                })
+        })
+        /* btns[1].addEventListener('click', () => {
             axiosIns({
                 method: 'GET',
                 url: '/user/get'
-                /* headers: {
-                    authorization: 'Bearer ' + token
-                } */
             }).then((res) => {
                 if (!res.data.status) {
                     console.log(res.data.data);
@@ -142,29 +182,32 @@
                 console.log(err);
                 alert(err);
             });
-        })
+        }) */
 
         btns[2].addEventListener('click', () => {
-            axiosIns({
-                method: 'POST',
-                url: '/category/add',
-                data: {
-                    categoryName: 'test'
-                },
-                /* headers: {
-                    authorization: 'Bearer ' + token,
-                } */
-            }).then((res) => {
-                if (!res.data.status) {
-                    console.log(res.data.data);
-                } else {
-                    console.log(res.data.msg);
-                }
-            }).catch((err) => {
-                console.log(err);
-                alert(err.message);
-            });
+            getInfo2('test')
+                .then((res) => {
+                    console.log(res);
+                })
         })
+        /*  btns[2].addEventListener('click', () => {
+             axiosIns({
+                 method: 'POST',
+                 url: '/category/add',
+                 data: {
+                     categoryName: 'test'
+                 },
+             }).then((res) => {
+                 if (!res.data.status) {
+                     console.log(res.data.data);
+                 } else {
+                     console.log(res.data.msg);
+                 }
+             }).catch((err) => {
+                 console.log(err);
+                 alert(err.message);
+             });
+         }) */
     </script>
 </body>
 

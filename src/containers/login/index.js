@@ -2,11 +2,14 @@ import React, { Component } from "react";
 import logo from "./img/logo.png";
 import { Form, Icon, Input, Button, message } from "antd";
 import './index.less';
-import axios from 'axios';
+import { setUserAsync } from '../../redux/action-creators/user';
+import { connect } from 'react-redux';
+import {setUserItem} from '../../storage/user-storage';
 
 const { Item } = Form;
 
-
+@connect(null, { setUserAsync })
+@Form.create({ name: 'login' })
 class Login extends Component {
     validator = (rule, value, callback) => {
         const type = rule.field === 'username' ? '用户名' : '密码';
@@ -45,7 +48,7 @@ class Login extends Component {
         const { validateFields, resetFields } = this.props.form;
         validateFields((errors, values) => {
             if (!errors) {
-                axios.post('http://localhost:5000/api/login', values).then((res) => {
+                /* axios.post('http://localhost:5000/api/login', values).then((res) => {
                     if (!res.data.status) {
                         this.props.history.push('/');
                     } else {
@@ -54,7 +57,26 @@ class Login extends Component {
                     }
                 }).catch(() => {
                     message.error('网络波动，请稍后访问');
-                });
+                }); */
+                const { username, password } = values;
+                /* reqLogin(username, password)
+                    .then((res) => {
+                        console.log(res);
+                        this.props.history.push('/');
+                    })
+                    .catch((errMsg) => {
+                        message.error(errMsg);
+                        resetFields(['password']);
+                    }) */
+                this.props.setUserAsync(username, password)
+                    .then((res) => {
+                        setUserItem('user',res);
+                        this.props.history.push('/');
+                    })
+                    .catch((errMsg) => {
+                        message.error(errMsg);
+                        resetFields(['password']);
+                    });
             }
         });
     }
@@ -150,4 +172,4 @@ class Login extends Component {
     }
 }
 
-export default Form.create({ name: 'login' })(Login);
+export default Login;
