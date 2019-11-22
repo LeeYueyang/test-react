@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import {Route, Switch } from 'react-router-dom';
+import {Router} from 'react-router';
 import routes from './config/routes';
+import history from './utils/history'
 
 export default class App extends Component {
     render() {
         return (
-            <Router>
+            <Router history={history}>
                 <Switch>
                     {
                         routes.map((route, index) => <Route {...route} key={index} />)

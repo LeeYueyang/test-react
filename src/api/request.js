@@ -1,6 +1,9 @@
 import axios from 'axios';
 import statusCodes from '../config/status';
 import store from '../redux/store';
+import { removeItem } from '../utils/storage/user-storage';
+import { removeUser } from '../redux/action-creators/user';
+import history from '../utils/history';
 
 const axiosIns = axios.create({
     baseURL: 'http://localhost:5000/api',
@@ -30,6 +33,11 @@ axiosIns.interceptors.response.use((res) => {
     }
 }, (err) => {
     if (err.response) {
+        if (err.response.status === 401) {
+            removeItem('user');
+            store.dispatch(removeUser());
+            history.push('/login');
+        }
         const errMsg = statusCodes[err.response.status] ? statusCodes[err.response.status] : '网络故障';
         return Promise.reject(errMsg);
     } else {

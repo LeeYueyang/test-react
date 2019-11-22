@@ -4,10 +4,12 @@ import { Form, Icon, Input, Button, message } from "antd";
 import './index.less';
 import { setUserAsync } from '../../redux/action-creators/user';
 import { connect } from 'react-redux';
-import {setUserItem} from '../../storage/user-storage';
+import { setUserItem } from '../../utils/storage/user-storage';
+import loginCheck from '../with-login-check';
 
 const { Item } = Form;
 
+@loginCheck
 @connect(null, { setUserAsync })
 @Form.create({ name: 'login' })
 class Login extends Component {
@@ -26,51 +28,16 @@ class Login extends Component {
         }
     }
 
-    /* validator = (type) => {
-        return (rule, value, callback) => {
-            type = type === 'username'? '用户名' : '密码';
-            if (!value) {
-                callback(`输入${type}`);
-            } else if (value.length < 5) {
-                callback(`${type}长度至少为5位`);
-            } else if (value.length > 12) {
-                callback(`${type}长度最长为12位`);
-            } else if (!/\w+/.test(value)) {
-                callback(`${type}只能由英文字母、数字、下划线组成`);
-            } else {
-                callback();
-            }
-        }
-    } */
-
     handleSubmit = (event) => {
         event.preventDefault();
         const { validateFields, resetFields } = this.props.form;
         validateFields((errors, values) => {
             if (!errors) {
-                /* axios.post('http://localhost:5000/api/login', values).then((res) => {
-                    if (!res.data.status) {
-                        this.props.history.push('/');
-                    } else {
-                        message.error(res.data.msg);
-                        resetFields(['password']);
-                    }
-                }).catch(() => {
-                    message.error('网络波动，请稍后访问');
-                }); */
                 const { username, password } = values;
-                /* reqLogin(username, password)
-                    .then((res) => {
-                        console.log(res);
-                        this.props.history.push('/');
-                    })
-                    .catch((errMsg) => {
-                        message.error(errMsg);
-                        resetFields(['password']);
-                    }) */
                 this.props.setUserAsync(username, password)
                     .then((res) => {
-                        setUserItem('user',res);
+                        setUserItem('user', res);
+                        console.log(this.props.history);
                         this.props.history.push('/');
                     })
                     .catch((errMsg) => {
@@ -97,24 +64,7 @@ class Login extends Component {
                         {
                             getFieldDecorator('username', {
                                 rules: [
-                                    /* {
-                                        required: true,
-                                        message: '输入用户名'
-                                    },
                                     {
-                                        min: 5,
-                                        message: '用户名长度至少5位'
-                                    },
-                                    {
-                                        max: 12,
-                                        message: '用户名长度不能超过12位'
-                                    },
-                                    {
-                                        pattern: /\w+/,
-                                        message: '用户名只能使用英文字母、数字、下划线'
-                                    } */
-                                    {
-                                        //validator: this.validator('username')
                                         validator: this.validator
                                     }
                                 ]
