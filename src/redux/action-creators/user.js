@@ -8,21 +8,13 @@ const setUser = (user) => {
     }
 }
 
-/* export function setUserAsync(username, password) {
-    return (dispatch) => {
-        //做异步操作。
-        return reqLogin(username, password).then((res) => {
-            const action = setUser(res);
-            //分发action。
-            dispatch(action);
-            return res;
-        })
-    }
-} */
 export function setUserAsync(username, password) {
+    console.log('outer');
     return (dispatch) => {
         //做异步操作。
-         return reqLogin(username, password).then((res) => {
+        console.log('inner1');
+        return reqLogin(username, password).then((res) => {
+            console.log('inner2');
             const action = setUser(res);
             //分发action。
             dispatch(action);

@@ -13,7 +13,7 @@ axiosIns.interceptors.request.use((config) => {
         config.data = Object.keys(config.data).reduce((prev, key) => prev +
             `&${key}=${config.data[key]}`, '').substring(1);
     }
-    const { user:{token} } = store.getState();
+    const { user: { token } } = store.getState();
     if (token) {
         config.headers['authorization'] = `Bearer ${token}`;
     }
@@ -37,6 +37,8 @@ axiosIns.interceptors.response.use((res) => {
             return Promise.reject('服务没有启动');
         } else if (err.message.match(/timeout/g)) {
             return Promise.reject('连接超时');
+        } else {
+            return Promise.reject('未知错误');
         }
     }
 });
