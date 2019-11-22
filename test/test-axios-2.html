@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <button class="btn">按钮1</button>
+    <button class="btn">按钮2</button>
+    <button class="btn">按钮3</button>
+    <script src="https://cdn.bootcss.com/axios/0.19.0/axios.min.js"></script>
+    <script type="text/javascript">
+        let btns = document.getElementsByClassName('btn');
+
+        const axiosIns = axios.create({
+            baseURL: 'http://localhost:5000/api',
+            timeout: 5000
+        })
+
+        let token = '';
+
+        axiosIns.interceptors.request.use((config) => {
+            config.data = Object.keys(config.data).reduce((prev, key) => {
+                return prev + `&${key}=${config.data[key]}`;
+            }, '').substring(1);
+            if (config.method === 'post') {
+                config.headers['content-type'] = 'application/x-www-form-urlencoded';
+            }
+            if (token) {
+                config.header['authorization'] = `Bearer ${token}`;
+            }
+            return config;
+        }, (error) => {
+            return Promise.reject(error);
+        })
+
+        const status = {
+            401: '请先登录',
+            403: '禁止访问',
+            404: '找不到资源',
+            500: '服务出现故障'
+        };
+
+        axiosIns.interceptors.response.use((response) => {
+            console.log('res1');
+            if (response.data.status === 0) {
+                return response.data.data;
+            } else {
+                //return Promise.reject(response.data.msg);
+                return '响应失败';
+            }
+        }, (error) => {
+            if (error.response) {
+                const errMsg = status[error.response.status] ? status[error.response.status] : '网络故障';
+                return Promise.reject(errMsg);
+            } else {
+                if (error.message.match(/Network Error/g)) {
+                    return Promise.reject('服务没有启动');
+                } else if (error.message.match(/timeout/g)) {
+                    return Promise.reject('连接超时');
+                }
+            }
+        })
+        axiosIns.interceptors.response.use((response) => {
+            console.log('res2');
+            return response;
+        }, (error) => {
+            console.log('error2');
+            console.log(error);
+            return Promise.reject(error);
+        })
+        axiosIns.interceptors.response.use((response) => {
+            console.log('res3');
+            console.log(response)
+        }, (error) => {
+            console.log('error3');
+            console.log(error);
+            return Promise.reject(error);
+        })
+
+        function reqLogin(username,password) {
+            return axiosIns({
+                method: 'POST',
+                url: '/login',
+                data: {
+                    username,
+                    password
+                }
+            })
+        }
+
+        btns[0].addEventListener('click', () => {
+            reqLogin('admin','admin1')
+            .then((res) => {
+                console.log(res);
+            }).catch((err)=>{
+                console.log(err);
+            })
+        })
+    </script>
+</body>
+
+</html>

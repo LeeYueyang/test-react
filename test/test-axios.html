@@ -54,10 +54,10 @@
                 return res.data.data;
             } else {
                 return Promise.reject(res.data.msg);
-                //return 'test errMsg';
             }
         }, (err) => {
             if (err.response) {
+                console.dir(err)
                 const errMsg = status[err.response.status] ? status[err.response.status] : '网络故障';
                 return Promise.reject(errMsg);
             } else {
@@ -140,7 +140,7 @@
         function reqGetInfo() {
             return axiosIns({
                 method: 'GET',
-                url: '/user/get'
+                url: '/user/get1'
             })
         }
 
